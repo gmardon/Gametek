@@ -6,58 +6,58 @@
 
 void SixteenBitRegister::setLow(uint8_t low)
 {
-    this->m_low.SetValue(low);
+    this->m_low.setValue(low);
 }
 
 uint8_t SixteenBitRegister::getLow() const
 {
-    return m_low.GetValue();
+    return m_low.getValue();
 }
 
-inline void SixteenBitRegister::setHigh(uint8_t high)
+void SixteenBitRegister::setHigh(uint8_t high)
 {
-    this->m_High.SetValue(high);
+    this->m_high.setValue(high);
 }
 
-u8 SixteenBitRegister::getHigh() const
+uint8_t SixteenBitRegister::getHigh() const
 {
-    return m_High.GetValue();
+    return m_high.getValue();
 }
 
 EightBitRegister* SixteenBitRegister::getHighRegister()
 {
-    return &m_High;
+    return &m_high;
 }
 
 EightBitRegister* SixteenBitRegister::getLowRegister()
 {
-    return &m_Low;
+    return &m_low;
 }
 
 void SixteenBitRegister::setValue(uint16_t value)
 {
-    m_Low.SetValue((uint8_t) (value & 0xFF));
-    m_High.SetValue((uint8_t) ((value >> 8) & 0xFF));
+    m_low.setValue((uint8_t) (value & 0xFF));
+    m_high.setValue((uint8_t) ((value >> 8) & 0xFF));
 }
 
 uint16_t SixteenBitRegister::getValue() const
 {
-    uint8_t high = m_High.GetValue();
-    uint8_t low = m_Low.GetValue();
+    uint8_t high = m_high.getValue();
+    uint8_t low = m_low.getValue();
 
     return (high << 8) + low;
 }
 
 void SixteenBitRegister::increment()
 {
-    uint16_t value = this->GetValue();
+    uint16_t value = this->getValue();
     value++;
-    this->SetValue(value);
+    this->setValue(value);
 }
 
 void SixteenBitRegister::decrement()
 {
-    u16 value = this->GetValue();
+    uint16_t value = this->getValue();
     value--;
-    this->SetValue(value);
+    this->setValue(value);
 }

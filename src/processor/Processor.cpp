@@ -35,11 +35,11 @@ void Processor::executeOPCode(uint8_t opcode) {
 
     if (isCB)
     {
-        opcodeTable = m_OPCodesCB;
+       // opcodeTable = m_OPCodesCB;
         opcode = m_memory->read(m_head++);
     }
     else
-        opcodeTable = m_OPCodes;
+        //opcodeTable = m_OPCodes;
     printf("[%d] %s\n", opcode, opCodeNames[opcode]);
 }
 
