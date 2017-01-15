@@ -7,10 +7,11 @@
 #include <cstdint>
 #include "../cartridge/Cartridge.hh"
 #include "MemoryHandler.hh"
+#include "../Gametek.hh"
 
 class Memory {
 public:
-    Memory();
+    Memory(Gametek *gametek);
     ~Memory();
     void fillFromCartridge(Cartridge *cartridge);
     uint8_t get(uint16_t address);
@@ -21,6 +22,8 @@ public:
     void setBaseHandler(MemoryHandler *handler);
     void load(uint16_t address, uint8_t value);
 private:
+    Gametek *m_gametek;
+    Cartridge *m_cartridge;
     uint8_t* m_RAM;
     MemoryHandler *m_ioHandler;
     MemoryHandler *m_commonHandler;

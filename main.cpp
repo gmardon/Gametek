@@ -1,5 +1,4 @@
 #include <iostream>
-#include "src/cartridge/Cartridge.hh"
 #include "src/Gametek.hh"
 
 int main() {

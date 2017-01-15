@@ -4,7 +4,9 @@
 
 #include "Memory.hh"
 
-Memory::Memory() {
+Memory::Memory(Gametek *gametek) {
+    this->m_gametek = gametek;
+    this->m_cartridge = gametek->getCartridge();
     m_RAM = (uint8_t *) malloc(65536 * sizeof(uint8_t));
 }
 
@@ -23,23 +25,24 @@ uint8_t Memory::get(uint16_t address) {
 }
 
 uint8_t Memory::read(uint16_t address) {
+    printf("%d\n", address & 0xE000);
     switch (address & 0xE000) {
         case 0x0000: {
-            /*if (m_duringBootROM)
+            if (m_gametek->getState() == BOOT)
             {
-                if (m_bCGB)
+                if (m_cartridge->isGBC())
                 {
                     if(address < 0x0100)
-                        return kBootRomCGB[address];
+                        return BootRomCGB[address];
                     if (address < 0x0900 && address > 0x01FF)
-                        return kBootRomCGB[address - 0x100];
+                        return BootRomCGB[address - 0x100];
                 }
                 else
                 {
                     if(address < 0x0100)
-                        return kBootRomDMG[address];
+                        return BootRomDMG[address];
                 }
-            }*/
+            }
         }
         case 0x2000:
         case 0x4000:

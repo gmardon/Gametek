@@ -7,32 +7,28 @@
 #include "memory/handlers/ROMMemoryHandler.hh"
 #include "memory/handlers/IOMemoryHandler.hh"
 #include "memory/handlers/CommonMemoryHandler.hh"
-#include "processor/Processor.hh"
 
+class Processor;
 
-Gametek::Gametek()
-{
-    m_memory = new Memory();
+Gametek::Gametek() {
+    m_memory = new Memory(this);
     m_cartridge = new Cartridge();
-    m_processor = new Processor(m_memory);
-    m_halt = false;
+    m_processor = new Processor(this);
+    m_state = BOOT;
 }
 
-bool Gametek::loadROM(const string file_path)
-{
+bool Gametek::loadROM(const string file_path) {
     bool loaded = m_cartridge->readFromFile(file_path);
-    if (loaded)
-    {
+    if (loaded) {
         m_memory->fillFromCartridge(m_cartridge);
         addMemoryHandlers();
         run();
-    }
-    else
+    } else
         return false;
+    return false;
 }
 
-bool Gametek::addMemoryHandlers()
-{
+bool Gametek::addMemoryHandlers() {
     m_memory->setIOHandler(new IOMemoryHandler());
     m_memory->setCommonHandler(new CommonMemoryHandler());
 
@@ -40,8 +36,7 @@ bool Gametek::addMemoryHandlers()
 
     bool notSupported = false;
 
-    switch (type)
-    {
+    switch (type) {
         case Cartridge::NoMBC:
             printf("NoMBC");
             m_memory->setBaseHandler(new ROMMemoryHandler(m_cartridge, m_memory));
@@ -75,22 +70,38 @@ bool Gametek::addMemoryHandlers()
     return !notSupported;
 }
 
-void Gametek::run()
-{
+void Gametek::run() {
     uint8_t cycles;
-    if (m_cartridge->isROMReaded())
-    {
+    if (m_cartridge->isROMReaded()) {
         m_RTCUpdateCount = 0;
-        while (!m_halt)
-        {
+        while (Gametek::getState() != HALT) {
             cycles = m_processor->tick();
 
             m_RTCUpdateCount++;
-            if (m_RTCUpdateCount == 50)
-            {
+            if (m_RTCUpdateCount == 50) {
                 m_RTCUpdateCount = 0;
                 m_processor->updateRealtimeClock();
             }
         }
     }
+}
+
+void Gametek::setState(GameState value) {
+    this->m_state = value;
+}
+
+GameState Gametek::getState() {
+    return (this->m_state);
+}
+
+Processor *Gametek::getProcessor() {
+    return (this->m_processor);
+}
+
+Cartridge *Gametek::getCartridge() {
+    return (this->m_cartridge);
+}
+
+Memory *Gametek::getMemory() {
+    return (this->m_memory);
 }

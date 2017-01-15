@@ -294,9 +294,14 @@ void Cartridge::setCartridgeType(int type)
     this->m_type = cartridgeType;
 }
 
-uint8_t *Cartridge::getROM()
+uint8_t *Cartridge::getROM() const
 {
     return (this->m_data);
+}
+
+bool Cartridge::isGBC() const
+{
+    return (this->m_GBC);
 }
 
 Cartridge::CartridgeType Cartridge::getType() const {

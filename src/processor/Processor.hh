@@ -5,25 +5,37 @@
 #ifndef GAMETEK_PROCESSOR_HH
 #define GAMETEK_PROCESSOR_HH
 
-
 #include <stdint-gcc.h>
 #include "../memory/Memory.hh"
+#include "../utils/SixteenBitRegister.hh"
+
+class Gametek;
 
 class Processor {
 public:
-    Processor(Memory *memory);
+    Processor(Gametek *gametek);
 
     void updateRealtimeClock();
+
     time_t getRealtimeClock();
+
     uint8_t tick();
+
 private:
     void executeOPCode(uint8_t opcode);
 
-    bool m_halt;
-    uint16_t m_head;
+    uint8_t retrieveOPCode();
+
     Memory *m_memory;
+    Cartridge *m_cartridge;
+    Gametek *m_gametek;
     time_t m_RTC;
-    bool m_duringBootROM;
+    SixteenBitRegister m_AF;
+    SixteenBitRegister m_BC;
+    SixteenBitRegister m_DE;
+    SixteenBitRegister m_HL;
+    SixteenBitRegister m_SP;
+    SixteenBitRegister m_PC;
 };
 
 

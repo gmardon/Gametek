@@ -1,9 +1,9 @@
 //
 // Created by gmardon on 12/01/17.
 //
-
 #ifndef GAMETEK_CARTRIDGE_H
 #define GAMETEK_CARTRIDGE_H
+
 #include <cstdint>
 #include <string>
 
@@ -33,8 +33,10 @@ public:
     int getROMSize() const;
     int getRAMSize() const;
     void setCartridgeType(int type);
-    uint8_t *getROM();
+    uint8_t *getROM() const;
     CartridgeType getType() const;
+    bool isGBC() const;
+
 private:
     uint8_t* m_data;
     bool m_readed;

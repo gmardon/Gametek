@@ -3,8 +3,6 @@
 //
 
 #include "ROMMemoryHandler.hh"
-#include "../../cartridge/Cartridge.hh"
-#include "../Memory.hh"
 
 ROMMemoryHandler::ROMMemoryHandler(Cartridge *cartridge, Memory *memory)
 {
