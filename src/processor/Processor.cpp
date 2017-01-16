@@ -26,6 +26,7 @@ Processor::Processor(Gametek *gametek) {
 
     m_operators = (Operator *) malloc(256 * (sizeof(Operator_t)));
     m_operators[0x00] = (Operator) {0x00, "NOP", &Processor::NOP, 1};
+    m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x31] = (Operator) {0x31, "LD_SP NN", &Processor::LD_SP_NN, 1};
     m_operators[0xAF] = (Operator) {0xAF, "CP N", &Processor::CP_N, 1};
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
@@ -138,6 +139,17 @@ void Processor::RST_38H()
 {
     stackPush(&m_PC);
     m_PC.setValue(0x0038);
+}
+
+void Processor::LD_NN_SP()
+{
+    uint8_t l = m_memory->read(m_PC.getValue());
+    m_PC.increment();
+    uint8_t h = m_memory->read(m_PC.getValue());
+    m_PC.increment();
+    uint16_t address = ((h << 8) + l);
+    m_memory->write(address, m_SP.getLow());
+    m_memory->write(address + 1, m_SP.getHigh());
 }
 
 void Processor::ADD_HL(uint8_t number) {

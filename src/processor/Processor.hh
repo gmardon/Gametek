@@ -60,6 +60,7 @@ protected:
     void CP_N();
     void LD_SP_NN();
     void RST_38H();
+    void LD_NN_SP();
 
 
 };
