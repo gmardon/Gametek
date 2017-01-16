@@ -9,10 +9,11 @@
 #include "memory/handlers/CommonMemoryHandler.hh"
 
 Gametek::Gametek() {
+    m_state = BOOT;
     m_memory = new Memory(this);
     m_cartridge = new Cartridge(this);
     m_processor = new Processor(this);
-    m_state = BOOT;
+    m_memory->init();
 }
 
 bool Gametek::loadROM(const string file_path) {
@@ -36,27 +37,27 @@ bool Gametek::addMemoryHandlers() {
 
     switch (type) {
         case Cartridge::NoMBC:
-            printf("NoMBC");
+            printf("NoMBC\n");
             m_memory->setBaseHandler(new ROMMemoryHandler(m_cartridge, m_memory));
             break;
         case Cartridge::MBC1:
-            printf("MBC1");
+            printf("MBC1\n");
             //m_memory->setBaseHandler(m_pMBC1MemoryRule);
             break;
         case Cartridge::MBC1Multi:
-            printf("MBC1Multi");
+            printf("MBC1Multi\n");
             //m_memory->setBaseHandler(m_pMultiMBC1MemoryRule);
             break;
         case Cartridge::MBC2:
-            printf("MBC2");
+            printf("MBC2\n");
             //m_memory->setBaseHandler(m_pMBC2MemoryRule);
             break;
         case Cartridge::MBC3:
-            printf("MBC3");
+            printf("MBC3\n");
             //m_memory->setBaseHandler(m_pMBC3MemoryRule);
             break;
         case Cartridge::MBC5:
-            printf("MBC5");
+            printf("MBC5\n");
             //m_memory->setBaseHandler(m_pMBC5MemoryRule);
             break;
         case Cartridge::NotSupported:

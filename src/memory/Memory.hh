@@ -8,6 +8,7 @@
 #include "../cartridge/Cartridge.hh"
 #include "MemoryHandler.hh"
 #include "../processor/Processor.hh"
+#include "../Gametek.hh"
 
 class Gametek;
 class Cartridge;
@@ -24,6 +25,7 @@ public:
     void setCommonHandler(MemoryHandler *handler);
     void setBaseHandler(MemoryHandler *handler);
     void load(uint16_t address, uint8_t value);
+    void init();
 private:
     Gametek *m_gametek;
     Cartridge *m_cartridge;

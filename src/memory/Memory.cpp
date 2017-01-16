@@ -7,8 +7,12 @@
 
 Memory::Memory(Gametek *gametek) {
     this->m_gametek = gametek;
-    this->m_cartridge = gametek->getCartridge();
-    this->m_processor = gametek->getProcessor();
+}
+
+void Memory::init()
+{
+    this->m_cartridge = m_gametek->getCartridge();
+    this->m_processor = m_gametek->getProcessor();
     m_RAM = (uint8_t *) malloc(65536 * sizeof(uint8_t));
 }
 
@@ -27,7 +31,6 @@ uint8_t Memory::get(uint16_t address) {
 }
 
 uint8_t Memory::read(uint16_t address) {
-    printf("%d\n", address & 0xE000);
     switch (address & 0xE000) {
         case 0x0000: {
             if (m_gametek->getState() == BOOT)
