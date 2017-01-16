@@ -3,10 +3,12 @@
 //
 
 #include "Memory.hh"
+#include "../processor/Processor.hh"
 
 Memory::Memory(Gametek *gametek) {
     this->m_gametek = gametek;
     this->m_cartridge = gametek->getCartridge();
+    this->m_processor = gametek->getProcessor();
     m_RAM = (uint8_t *) malloc(65536 * sizeof(uint8_t));
 }
 

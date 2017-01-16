@@ -7,8 +7,9 @@
 #include <algorithm>
 #include <cstring>
 #include "Cartridge.hh"
+#include "../Gametek.hh"
 
-Cartridge::Cartridge() {
+Cartridge::Cartridge(Gametek *gametek) {
     this->m_data = NULL;
     this->m_readed = false;
 }

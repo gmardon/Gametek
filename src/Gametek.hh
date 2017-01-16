@@ -4,25 +4,9 @@
 
 #ifndef GAMETEK_GAMETEK_H
 #define GAMETEK_GAMETEK_H
-
-#define FLAG_ZERO 0x80
-#define FLAG_SUB 0x40
-#define FLAG_HALF 0x20
-#define FLAG_CARRY 0x10
-#define FLAG_NONE 0
-
-#define GAMEBOY_WIDTH 160
-#define GAMEBOY_HEIGHT 144
-
 #include "memory/Memory.hh"
 #include "processor/Processor.hh"
 #include "cartridge/Cartridge.hh"
-
-enum GameState {
-    BOOT,
-    IN_GAME,
-    HALT
-};
 
 // From GameBoy-Online emulator
 const uint8_t BootRomDMG[256] = {
@@ -174,6 +158,22 @@ const uint8_t BootRomCGB[2048] = {
         0x1f, 0x00, 0xff, 0x03, 0x40, 0x41, 0x42, 0x20, 0x21, 0x22, 0x80, 0x81, 0x82, 0x10, 0x11, 0x12,
         0x12, 0xb0, 0x79, 0xb8, 0xad, 0x16, 0x17, 0x07, 0xba, 0x05, 0x7c, 0x13, 0x00, 0x00, 0x00, 0x00
 };
+
+#define FLAG_ZERO 0x80
+#define FLAG_SUB 0x40
+#define FLAG_HALF 0x20
+#define FLAG_CARRY 0x10
+#define FLAG_NONE 0
+
+enum GameState {
+    BOOT,
+    IN_GAME,
+    HALT
+};
+
+class Processor;
+class Memory;
+class Cartridge;
 
 class Gametek {
 public:

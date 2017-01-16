@@ -6,8 +6,14 @@
 
 #include <cstdint>
 #include <string>
+#include "../Gametek.hh"
+
+#define GAMEBOY_WIDTH 160
+#define GAMEBOY_HEIGHT 144
 
 using namespace std;
+
+class Gametek;
 
 class Cartridge {
 public:
@@ -22,7 +28,7 @@ public:
         NotSupported
     };
 
-    Cartridge();
+    Cartridge(Gametek *gametek);
     ~Cartridge();
 
     bool readFromFile(string const file_path);

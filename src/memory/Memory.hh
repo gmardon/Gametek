@@ -7,7 +7,10 @@
 #include <cstdint>
 #include "../cartridge/Cartridge.hh"
 #include "MemoryHandler.hh"
-#include "../Gametek.hh"
+#include "../processor/Processor.hh"
+
+class Gametek;
+class Cartridge;
 
 class Memory {
 public:
@@ -24,6 +27,7 @@ public:
 private:
     Gametek *m_gametek;
     Cartridge *m_cartridge;
+    Processor *m_processor;
     uint8_t* m_RAM;
     MemoryHandler *m_ioHandler;
     MemoryHandler *m_commonHandler;

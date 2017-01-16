@@ -8,8 +8,11 @@
 #include <stdint-gcc.h>
 #include "../memory/Memory.hh"
 #include "../utils/SixteenBitRegister.hh"
+#include "../Gametek.hh"
 
 class Gametek;
+class Memory;
+class Cartridge;
 
 class Processor {
 public:
