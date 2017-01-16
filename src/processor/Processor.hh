@@ -52,7 +52,9 @@ protected:
     void untoggleFlag(uint8_t flag);
     bool isSetFlag(uint8_t flag);
     void ADD_HL(uint8_t number);
+    void OP_DEC(EightBitRegister* reg);
     void OP_CP(uint8_t number);
+    void OP_LD(uint16_t address, uint8_t reg);
     void stackPush(SixteenBitRegister* reg);
     void stackPop(SixteenBitRegister* reg);
     // OPERATOR //
@@ -61,6 +63,9 @@ protected:
     void LD_SP_NN();
     void RST_38H();
     void LD_NN_SP();
+    void LD_HLI_A();
+    void INC_HL();
+    void DEC_B();
 
 
 };

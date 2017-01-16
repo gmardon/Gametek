@@ -5,7 +5,6 @@
 #include <zconf.h>
 #include "Processor.hh"
 #include "../Gametek.hh"
-#include "../opcode.hh"
 
 Processor::Processor(Gametek *gametek) {
     m_memory = gametek->getMemory();
@@ -27,6 +26,9 @@ Processor::Processor(Gametek *gametek) {
     m_operators = (Operator *) malloc(256 * (sizeof(Operator_t)));
     m_operators[0x00] = (Operator) {0x00, "NOP", &Processor::NOP, 1};
     m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
+    m_operators[0x05] = (Operator) {0x05, "DEC B", &Processor::DEC_B, 1};
+    m_operators[0x22] = (Operator) {0x22, "LD (HLI),A", &Processor::LD_HLI_A, 1};
+    m_operators[0x23] = (Operator) {0x23, "INC HL", &Processor::INC_HL, 1};
     m_operators[0x31] = (Operator) {0x31, "LD_SP NN", &Processor::LD_SP_NN, 1};
     m_operators[0xAF] = (Operator) {0xAF, "CP N", &Processor::CP_N, 1};
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
@@ -45,8 +47,6 @@ uint8_t Processor::tick() {
     } else {
         printf("Halt requested..");
     }
-    usleep(100000);
-
 }
 
 uint8_t Processor::retrieveOPCode() {
@@ -152,6 +152,22 @@ void Processor::LD_NN_SP()
     m_memory->write(address + 1, m_SP.getHigh());
 }
 
+void Processor::LD_HLI_A()
+{
+    OP_LD(m_HL.getValue(), m_AF.getHigh());
+    m_HL.increment();
+}
+
+void Processor::INC_HL()
+{
+    m_HL.increment();
+}
+
+void Processor::DEC_B()
+{
+    OP_DEC(m_BC.getHighRegister());
+}
+
 void Processor::ADD_HL(uint8_t number) {
     int result = m_HL.getValue() + number;
     isSetFlag(FLAG_ZERO) ? setFlag(FLAG_ZERO) : clearAllFlags();
@@ -162,6 +178,19 @@ void Processor::ADD_HL(uint8_t number) {
         toggleFlag(FLAG_HALF);
     }
     m_HL.setValue(static_cast<uint16_t > (result));
+}
+
+void Processor::OP_DEC(EightBitRegister* reg)
+{
+    uint8_t result = reg->getValue() - 1;
+    reg->setValue(result);
+    isSetFlag(FLAG_CARRY) ? setFlag(FLAG_CARRY) : clearAllFlags();
+    toggleFlag(FLAG_SUB);
+    toggleZeroFlagFromResult(result);
+    if ((result & 0x0F) == 0x0F)
+    {
+        toggleFlag(FLAG_HALF);
+    }
 }
 
 void Processor::OP_CP(uint8_t number)
@@ -179,6 +208,11 @@ void Processor::OP_CP(uint8_t number)
     {
         toggleFlag(FLAG_HALF);
     }
+}
+
+void Processor::OP_LD(uint16_t address, uint8_t reg)
+{
+    m_memory->write(address, reg);
 }
 
 void Processor::stackPush(SixteenBitRegister* reg)
