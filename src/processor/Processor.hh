@@ -57,7 +57,8 @@ protected:
     void OP_LD(uint16_t address, uint8_t reg);
     void stackPush(SixteenBitRegister* reg);
     void stackPop(SixteenBitRegister* reg);
-    // OPERATOR //
+
+    // OPERATORS //
     void NOP();
     void CP_N();
     void LD_SP_NN();
@@ -66,6 +67,7 @@ protected:
     void LD_HLI_A();
     void INC_HL();
     void DEC_B();
+    void JR_NZ_N();
 
 
 };

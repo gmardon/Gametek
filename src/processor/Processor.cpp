@@ -27,6 +27,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x00] = (Operator) {0x00, "NOP", &Processor::NOP, 1};
     m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x05] = (Operator) {0x05, "DEC B", &Processor::DEC_B, 1};
+    m_operators[0x20] = (Operator) {0x20, "JR NZ,n", &Processor::JR_NZ_N, 1};
     m_operators[0x22] = (Operator) {0x22, "LD (HLI),A", &Processor::LD_HLI_A, 1};
     m_operators[0x23] = (Operator) {0x23, "INC HL", &Processor::INC_HL, 1};
     m_operators[0x31] = (Operator) {0x31, "LD_SP NN", &Processor::LD_SP_NN, 1};
@@ -166,6 +167,17 @@ void Processor::INC_HL()
 void Processor::DEC_B()
 {
     OP_DEC(m_BC.getHighRegister());
+}
+
+void Processor::JR_NZ_N()
+{
+    if (!isSetFlag(FLAG_ZERO))
+    {
+        m_PC.setValue(m_PC.getValue() + 1 + (m_memory->read(m_PC.getValue())));
+        //m_branchTaken = true;
+    }
+    else
+        m_PC.increment();
 }
 
 void Processor::ADD_HL(uint8_t number) {
