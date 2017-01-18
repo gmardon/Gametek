@@ -41,7 +41,6 @@ void Memory::printRAM() {
             printf("0x__ ");
         else
             printf("0x%2X ", m_RAM[i]);
-
     }
 }
 
