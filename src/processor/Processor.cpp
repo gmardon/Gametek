@@ -27,6 +27,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x00] = (Operator) {0x00, "NOP", &Processor::NOP, 1};
     m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x05] = (Operator) {0x05, "DEC B", &Processor::DEC_B, 1};
+    m_operators[0x0E] = (Operator) {0x0E, "LD C,n", &Processor::LD_C_N, 1};
     m_operators[0x20] = (Operator) {0x20, "JR NZ,n", &Processor::JR_NZ_N, 1};
     m_operators[0x21] = (Operator) {0x21, "LD HL,nn", &Processor::LD_HL_NN, 1};
     m_operators[0x22] = (Operator) {0x22, "LD (HLI),A", &Processor::LD_HLI_A, 1};
@@ -75,7 +76,7 @@ void Processor::executeOPCode(uint8_t opcode) {
 
     Operator *targetOperators;
     if (isCB) {
-        printf("[PC: %i][Found: 0x%02X]\n", m_PC.getValue(), opcode);
+        printf("[PC: %i][Found: 0x%02X] Use CB operators\n", m_PC.getValue(), opcode);
         opcode = retrieveOPCode();
         targetOperators = m_operatorsCB;
     } else
@@ -185,7 +186,12 @@ void Processor::DEC_B() {
 }
 
 void Processor::BIT_7_H() {
+    OP_BIT(m_HL.getHighRegister(), 7);
+}
 
+void Processor::LD_C_N() {
+    OP_LD(m_BC.getLowRegister(), m_PC.getValue());
+    m_PC.increment();
 }
 
 void Processor::JR_NZ_N() {
