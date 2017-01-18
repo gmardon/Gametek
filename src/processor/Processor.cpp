@@ -25,16 +25,20 @@ Processor::Processor(Gametek *gametek) {
 
     m_operators = (Operator *) malloc(256 * (sizeof(Operator_t)));
     m_operators[0x00] = (Operator) {0x00, "NOP", &Processor::NOP, 1};
-    m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x05] = (Operator) {0x05, "DEC B", &Processor::DEC_B, 1};
+    m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
+    m_operators[0x0C] = (Operator) {0x0C, "INC C", &Processor::INC_C, 1};
     m_operators[0x0E] = (Operator) {0x0E, "LD C,n", &Processor::LD_C_N, 1};
     m_operators[0x20] = (Operator) {0x20, "JR NZ,n", &Processor::JR_NZ_N, 1};
     m_operators[0x21] = (Operator) {0x21, "LD HL,nn", &Processor::LD_HL_NN, 1};
-    m_operators[0x22] = (Operator) {0x22, "LD (HLI),A", &Processor::LD_HLI_A, 1};
+    m_operators[0x22] = (Operator) {0x22, "LDI (HL),A", &Processor::LDI_HL_A, 1};
     m_operators[0x23] = (Operator) {0x23, "INC HL", &Processor::INC_HL, 1};
     m_operators[0x31] = (Operator) {0x31, "LD SP,nn", &Processor::LD_SP_NN, 1};
     m_operators[0x32] = (Operator) {0x32, "LDD (HL),A", &Processor::LDD_HL_A, 1};
+    m_operators[0x3E] = (Operator) {0x3E, "LD A,n", &Processor::LD_A_N, 1};
+    m_operators[0x77] = (Operator) {0x77, "LD (HL),A", &Processor::LD_HL_A, 1};
     m_operators[0xAF] = (Operator) {0xAF, "XOR A", &Processor::XOR_A, 1};
+    m_operators[0xE2] = (Operator) {0xE2, "LDH (C),A", &Processor::LDH_C_A, 1};
     m_operators[0xFE] = (Operator) {0xFE, "CP N", &Processor::CP_N, 1};
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
 
@@ -76,13 +80,13 @@ void Processor::executeOPCode(uint8_t opcode) {
 
     Operator *targetOperators;
     if (isCB) {
-        printf("[PC: %i][Found: 0x%02X] Use CB operators\n", m_PC.getValue(), opcode);
+        printf("[PC: %04X][Found: 0x%02X] Use CB operators\n", m_PC.getValue() - 1, opcode);
         opcode = retrieveOPCode();
         targetOperators = m_operatorsCB;
     } else
         targetOperators = m_operators;
-
-    printf("[PC: %i][Found: 0x%02X] %s\n", m_PC.getValue(), opcode, targetOperators[opcode].name.c_str());
+    printf("[PC: %04X]", m_PC.getValue() - 1);
+    printf("[Found: 0x%02X] %s\n", opcode, targetOperators[opcode].name.c_str());
     auto ptrRef = targetOperators[opcode].function;
     (this->*ptrRef)();
 }
@@ -139,6 +143,13 @@ void Processor::XOR_A() {
     OP_XOR(m_AF.getHigh());
 }
 
+void Processor::INC_C() {
+    OP_INC(m_BC.getLowRegister());
+}
+
+void Processor::LD_HL_A() {
+    OP_LD(m_HL.getValue(), m_AF.getHigh());
+}
 
 void Processor::CP_N() {
     OP_CP(m_memory->read(m_PC.getValue()));
@@ -148,6 +159,11 @@ void Processor::CP_N() {
 void Processor::RST_38H() {
     stackPush(&m_PC);
     m_PC.setValue(0x0038);
+}
+
+void Processor::LD_A_N() {
+    OP_LD(m_AF.getHighRegister(), m_PC.getValue());
+    m_PC.increment();
 }
 
 void Processor::LD_NN_SP() {
@@ -160,7 +176,7 @@ void Processor::LD_NN_SP() {
     m_memory->write(address + 1, m_SP.getHigh());
 }
 
-void Processor::LD_HLI_A() {
+void Processor::LDI_HL_A() {
     OP_LD(m_HL.getValue(), m_AF.getHigh());
     m_HL.increment();
 }
@@ -181,6 +197,20 @@ void Processor::INC_HL() {
     m_HL.increment();
 }
 
+void Processor::OP_INC(EightBitRegister *reg) {
+    uint8_t result = reg->getValue() + 1;
+    reg->setValue(result);
+    isSetFlag(FLAG_CARRY) ? setFlag(FLAG_CARRY) : clearAllFlags();
+    toggleZeroFlagFromResult(result);
+    if ((result & 0x0F) == 0x00)
+        toggleFlag(FLAG_HALF);
+}
+
+
+void Processor::LDH_C_A() {
+    OP_LD(static_cast<uint16_t> (0xFF00 + m_BC.getLow()), m_AF.getHigh());
+}
+
 void Processor::DEC_B() {
     OP_DEC(m_BC.getHighRegister());
 }
@@ -196,11 +226,10 @@ void Processor::LD_C_N() {
 
 void Processor::JR_NZ_N() {
     if (!isSetFlag(FLAG_ZERO)) {
-        m_PC.setValue(m_PC.getValue() + 1 + (m_memory->read(m_PC.getValue())));
+        m_PC.setValue(m_PC.getValue() + 1 + (static_cast<int8_t > (m_memory->read(m_PC.getValue()))));
         //m_branchTaken = true;
-
-    }
-    m_PC.increment();
+    } else
+        m_PC.increment();
 }
 
 void Processor::ADD_HL(uint8_t number) {

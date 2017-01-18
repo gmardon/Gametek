@@ -3,6 +3,7 @@
 // Created by gmardon on 13/01/17.
 //
 
+#include <zconf.h>
 #include "Gametek.hh"
 #include "memory/handlers/ROMMemoryHandler.hh"
 #include "memory/handlers/IOMemoryHandler.hh"
@@ -81,6 +82,8 @@ void Gametek::run() {
                 m_RTCUpdateCount = 0;
                 m_processor->updateRealtimeClock();
             }
+            // simulate ticks \o/
+            //usleep(100000);
         }
     }
 }
