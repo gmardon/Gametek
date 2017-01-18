@@ -42,6 +42,7 @@ private:
     SixteenBitRegister m_SP;
     SixteenBitRegister m_PC;
     Operator *m_operators;
+    Operator *m_operatorsCB;
 
 protected:
     void clearAllFlags();
@@ -52,15 +53,18 @@ protected:
     void untoggleFlag(uint8_t flag);
     bool isSetFlag(uint8_t flag);
     void ADD_HL(uint8_t number);
+    void OP_XOR(uint8_t number);
     void OP_DEC(EightBitRegister* reg);
     void OP_CP(uint8_t number);
     void OP_LD(uint16_t address, uint8_t reg);
+    void OP_LD(EightBitRegister* reg, uint16_t address);
     void stackPush(SixteenBitRegister* reg);
     void stackPop(SixteenBitRegister* reg);
 
     // OPERATORS //
     void NOP();
     void CP_N();
+    void XOR_A();
     void LD_SP_NN();
     void RST_38H();
     void LD_NN_SP();
@@ -68,8 +72,8 @@ protected:
     void INC_HL();
     void DEC_B();
     void JR_NZ_N();
-
-
+    void LD_HL_NN();
+    void LDD_HL_A();
 };
 
 #endif //GAMETEK_PROCESSOR_HH

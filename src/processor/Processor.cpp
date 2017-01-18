@@ -28,11 +28,16 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x05] = (Operator) {0x05, "DEC B", &Processor::DEC_B, 1};
     m_operators[0x20] = (Operator) {0x20, "JR NZ,n", &Processor::JR_NZ_N, 1};
+    m_operators[0x21] = (Operator) {0x21, "LD HL,nn", &Processor::LD_HL_NN, 1};
     m_operators[0x22] = (Operator) {0x22, "LD (HLI),A", &Processor::LD_HLI_A, 1};
     m_operators[0x23] = (Operator) {0x23, "INC HL", &Processor::INC_HL, 1};
-    m_operators[0x31] = (Operator) {0x31, "LD_SP NN", &Processor::LD_SP_NN, 1};
-    m_operators[0xAF] = (Operator) {0xAF, "CP N", &Processor::CP_N, 1};
+    m_operators[0x31] = (Operator) {0x31, "LD SP,nn", &Processor::LD_SP_NN, 1};
+    m_operators[0x32] = (Operator) {0x32, "LDD (HL),A", &Processor::LDD_HL_A, 1};
+    m_operators[0xAF] = (Operator) {0xAF, "XOR A", &Processor::XOR_A, 1};
+    m_operators[0xFE] = (Operator) {0xFE, "CP N", &Processor::CP_N, 1};
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
+
+    m_operatorsCB = (Operator *) malloc(256 * (sizeof(Operator_t)));
 }
 
 uint8_t Processor::tick() {
@@ -67,18 +72,18 @@ uint8_t Processor::retrieveOPCode() {
 void Processor::executeOPCode(uint8_t opcode) {
     bool isCB = (opcode == 0xCB);
 
-
-    /*if (isCB)
+    Operator *targetOperators;
+    if (isCB)
     {
-       // opcodeTable = m_OPCodesCB;
-        //opcode = m_memory->read(m_head++);
+        printf("[PC: %i][Found: 0x%02X]\n", m_PC.getValue(), opcode);
+        opcode = retrieveOPCode();
+        targetOperators = m_operatorsCB;
     }
     else
-        //opcodeTable = m_OPCodes;
-        m_operatorsZ
-     */
-    printf("[PC: %i][Found: 0x%02X] %s\n", m_PC.getValue(), opcode, this->m_operators[opcode].name.c_str());
-    auto ptrRef = this->m_operators[opcode].function;
+        targetOperators = m_operators;
+
+    printf("[PC: %i][Found: 0x%02X] %s\n", m_PC.getValue(), opcode, targetOperators[opcode].name.c_str());
+    auto ptrRef = targetOperators[opcode].function;
     (this->*ptrRef)();
 }
 
@@ -129,6 +134,11 @@ void Processor::LD_SP_NN() {
     m_SP.setHigh(m_memory->read(m_PC.getValue()));
     m_PC.increment();
 }
+void Processor::XOR_A()
+{
+    OP_XOR(m_AF.getHigh());
+}
+
 
 void Processor::CP_N()
 {
@@ -159,6 +169,20 @@ void Processor::LD_HLI_A()
     m_HL.increment();
 }
 
+void Processor::LD_HL_NN()
+{
+    OP_LD(m_HL.getLowRegister(), m_PC.getValue());
+    m_PC.increment();
+    OP_LD(m_HL.getHighRegister(), m_PC.getValue());
+    m_PC.increment();
+}
+
+void Processor::LDD_HL_A()
+{
+    OP_LD(m_HL.getValue(), m_AF.getHigh());
+    m_HL.decrement();
+}
+
 void Processor::INC_HL()
 {
     m_HL.increment();
@@ -175,9 +199,11 @@ void Processor::JR_NZ_N()
     {
         m_PC.setValue(m_PC.getValue() + 1 + (m_memory->read(m_PC.getValue())));
         //m_branchTaken = true;
+
     }
-    else
-        m_PC.increment();
+    m_PC.increment();
+
+    m_memory->printRAM();
 }
 
 void Processor::ADD_HL(uint8_t number) {
@@ -191,6 +217,15 @@ void Processor::ADD_HL(uint8_t number) {
     }
     m_HL.setValue(static_cast<uint16_t > (result));
 }
+
+void Processor::OP_XOR(uint8_t number)
+{
+    uint8_t result = m_AF.getHigh() ^ number;
+    m_AF.setHigh(result);
+    clearAllFlags();
+    toggleZeroFlagFromResult(result);
+}
+
 
 void Processor::OP_DEC(EightBitRegister* reg)
 {
@@ -225,6 +260,11 @@ void Processor::OP_CP(uint8_t number)
 void Processor::OP_LD(uint16_t address, uint8_t reg)
 {
     m_memory->write(address, reg);
+}
+
+void Processor::OP_LD(EightBitRegister* reg, uint16_t address)
+{
+    reg->setValue(m_memory->read(address));
 }
 
 void Processor::stackPush(SixteenBitRegister* reg)
