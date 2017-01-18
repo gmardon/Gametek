@@ -27,7 +27,23 @@ void Memory::fillFromCartridge(Cartridge *cartridge) {
 }
 
 uint8_t Memory::get(uint16_t address) {
-    return (m_RAM[address]);
+    if (address < 65536)
+        return (m_RAM[address]);
+    else
+        return (NULL);
+}
+
+void Memory::printRAM() {
+
+    for(int i = 0; i < 65536; i++) {
+        if (i % 10 == 0)
+            printf("\n%-6i\t", i);
+        if (m_RAM[i] == NULL)
+            printf("0x__ ");
+        else
+            printf("0x%2X ", m_RAM[i]);
+
+    }
 }
 
 uint8_t Memory::read(uint16_t address) {
