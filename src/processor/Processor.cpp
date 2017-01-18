@@ -38,6 +38,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x3E] = (Operator) {0x3E, "LD A,n", &Processor::LD_A_N, 1};
     m_operators[0x77] = (Operator) {0x77, "LD (HL),A", &Processor::LD_HL_A, 1};
     m_operators[0xAF] = (Operator) {0xAF, "XOR A", &Processor::XOR_A, 1};
+    m_operators[0xE0] = (Operator) {0xE0, "LDH (n),A", &Processor::LDH_N_A, 1};
     m_operators[0xE2] = (Operator) {0xE2, "LDH (C),A", &Processor::LDH_C_A, 1};
     m_operators[0xFE] = (Operator) {0xFE, "CP N", &Processor::CP_N, 1};
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
@@ -209,6 +210,11 @@ void Processor::OP_INC(EightBitRegister *reg) {
 
 void Processor::LDH_C_A() {
     OP_LD(static_cast<uint16_t> (0xFF00 + m_BC.getLow()), m_AF.getHigh());
+}
+
+void Processor::LDH_N_A() {
+    OP_LD(static_cast<uint16_t> (0xFF00 + m_memory->read(m_PC.getValue())), m_AF.getHigh());
+    m_PC.increment();
 }
 
 void Processor::DEC_B() {
