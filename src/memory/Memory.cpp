@@ -36,11 +36,11 @@ uint8_t Memory::get(uint16_t address) {
 void Memory::printRAM() {
     for(int i = 0; i < 65536; i++) {
         if (i % 10 == 0)
-            printf("\n%-6i\t", i);
+            printf("\n%#-6i\t", i);
         if (m_RAM[i] == NULL)
-            printf("0x__ ");
+            printf("     ");
         else
-            printf("0x%2X ", m_RAM[i]);
+            printf("0x%02X ", m_RAM[i]);
     }
 }
 
