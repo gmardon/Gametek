@@ -34,7 +34,6 @@ uint8_t Memory::get(uint16_t address) {
 }
 
 void Memory::printRAM() {
-
     for(int i = 0; i < 65536; i++) {
         if (i % 10 == 0)
             printf("\n%-6i\t", i);
