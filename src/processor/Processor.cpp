@@ -38,6 +38,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
 
     m_operatorsCB = (Operator *) malloc(256 * (sizeof(Operator_t)));
+    m_operatorsCB[0x7C] = (Operator) {0x7C, "BIT 7,H", &Processor::BIT_7_H, 1};
 }
 
 uint8_t Processor::tick() {
@@ -73,13 +74,11 @@ void Processor::executeOPCode(uint8_t opcode) {
     bool isCB = (opcode == 0xCB);
 
     Operator *targetOperators;
-    if (isCB)
-    {
+    if (isCB) {
         printf("[PC: %i][Found: 0x%02X]\n", m_PC.getValue(), opcode);
         opcode = retrieveOPCode();
         targetOperators = m_operatorsCB;
-    }
-    else
+    } else
         targetOperators = m_operators;
 
     printf("[PC: %i][Found: 0x%02X] %s\n", m_PC.getValue(), opcode, targetOperators[opcode].name.c_str());
@@ -134,26 +133,23 @@ void Processor::LD_SP_NN() {
     m_SP.setHigh(m_memory->read(m_PC.getValue()));
     m_PC.increment();
 }
-void Processor::XOR_A()
-{
+
+void Processor::XOR_A() {
     OP_XOR(m_AF.getHigh());
 }
 
 
-void Processor::CP_N()
-{
+void Processor::CP_N() {
     OP_CP(m_memory->read(m_PC.getValue()));
     m_PC.increment();
 }
 
-void Processor::RST_38H()
-{
+void Processor::RST_38H() {
     stackPush(&m_PC);
     m_PC.setValue(0x0038);
 }
 
-void Processor::LD_NN_SP()
-{
+void Processor::LD_NN_SP() {
     uint8_t l = m_memory->read(m_PC.getValue());
     m_PC.increment();
     uint8_t h = m_memory->read(m_PC.getValue());
@@ -163,47 +159,42 @@ void Processor::LD_NN_SP()
     m_memory->write(address + 1, m_SP.getHigh());
 }
 
-void Processor::LD_HLI_A()
-{
+void Processor::LD_HLI_A() {
     OP_LD(m_HL.getValue(), m_AF.getHigh());
     m_HL.increment();
 }
 
-void Processor::LD_HL_NN()
-{
+void Processor::LD_HL_NN() {
     OP_LD(m_HL.getLowRegister(), m_PC.getValue());
     m_PC.increment();
     OP_LD(m_HL.getHighRegister(), m_PC.getValue());
     m_PC.increment();
 }
 
-void Processor::LDD_HL_A()
-{
+void Processor::LDD_HL_A() {
     OP_LD(m_HL.getValue(), m_AF.getHigh());
     m_HL.decrement();
 }
 
-void Processor::INC_HL()
-{
+void Processor::INC_HL() {
     m_HL.increment();
 }
 
-void Processor::DEC_B()
-{
+void Processor::DEC_B() {
     OP_DEC(m_BC.getHighRegister());
 }
 
-void Processor::JR_NZ_N()
-{
-    if (!isSetFlag(FLAG_ZERO))
-    {
+void Processor::BIT_7_H() {
+
+}
+
+void Processor::JR_NZ_N() {
+    if (!isSetFlag(FLAG_ZERO)) {
         m_PC.setValue(m_PC.getValue() + 1 + (m_memory->read(m_PC.getValue())));
         //m_branchTaken = true;
 
     }
     m_PC.increment();
-
-    m_memory->printRAM();
 }
 
 void Processor::ADD_HL(uint8_t number) {
@@ -218,65 +209,64 @@ void Processor::ADD_HL(uint8_t number) {
     m_HL.setValue(static_cast<uint16_t > (result));
 }
 
-void Processor::OP_XOR(uint8_t number)
-{
-    uint8_t result = m_AF.getHigh() ^ number;
+void Processor::OP_BIT(EightBitRegister *reg, int bit) {
+    if (((reg->getValue() >> bit) & 0x01) == 0) {
+        toggleFlag(FLAG_ZERO);
+    } else {
+        untoggleFlag(FLAG_ZERO);
+    }
+    toggleFlag(FLAG_HALF);
+    untoggleFlag(FLAG_SUB);
+}
+
+void Processor::OP_XOR(uint8_t number) {
+    uint8_t result = m_AF.getHigh() ^number;
     m_AF.setHigh(result);
     clearAllFlags();
     toggleZeroFlagFromResult(result);
 }
 
 
-void Processor::OP_DEC(EightBitRegister* reg)
-{
+void Processor::OP_DEC(EightBitRegister *reg) {
     uint8_t result = reg->getValue() - 1;
     reg->setValue(result);
     isSetFlag(FLAG_CARRY) ? setFlag(FLAG_CARRY) : clearAllFlags();
     toggleFlag(FLAG_SUB);
     toggleZeroFlagFromResult(result);
-    if ((result & 0x0F) == 0x0F)
-    {
+    if ((result & 0x0F) == 0x0F) {
         toggleFlag(FLAG_HALF);
     }
 }
 
-void Processor::OP_CP(uint8_t number)
-{
+void Processor::OP_CP(uint8_t number) {
     setFlag(FLAG_SUB);
-    if (m_AF.getHigh() < number)
-    {
+    if (m_AF.getHigh() < number) {
         toggleFlag(FLAG_CARRY);
     }
-    if (m_AF.getHigh() == number)
-    {
+    if (m_AF.getHigh() == number) {
         toggleFlag(FLAG_ZERO);
     }
-    if (((m_AF.getHigh() - number) & 0xF) > (m_AF.getHigh() & 0xF))
-    {
+    if (((m_AF.getHigh() - number) & 0xF) > (m_AF.getHigh() & 0xF)) {
         toggleFlag(FLAG_HALF);
     }
 }
 
-void Processor::OP_LD(uint16_t address, uint8_t reg)
-{
+void Processor::OP_LD(uint16_t address, uint8_t reg) {
     m_memory->write(address, reg);
 }
 
-void Processor::OP_LD(EightBitRegister* reg, uint16_t address)
-{
+void Processor::OP_LD(EightBitRegister *reg, uint16_t address) {
     reg->setValue(m_memory->read(address));
 }
 
-void Processor::stackPush(SixteenBitRegister* reg)
-{
+void Processor::stackPush(SixteenBitRegister *reg) {
     m_SP.decrement();
     m_memory->write(m_SP.getValue(), reg->getHigh());
     m_SP.decrement();
     m_memory->write(m_SP.getValue(), reg->getLow());
 }
 
-void Processor::stackPop(SixteenBitRegister* reg)
-{
+void Processor::stackPop(SixteenBitRegister *reg) {
     reg->setLow(m_memory->read(m_SP.getValue()));
     m_SP.increment();
     reg->setHigh(m_memory->read(m_SP.getValue()));
