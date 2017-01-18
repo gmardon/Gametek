@@ -83,6 +83,8 @@ protected:
     void LD_C_N();
     void LD_HL_A();
     void LDH_N_A();
+    void LD_DE_NN();
+    void LD_A_DE();
 };
 
 #endif //GAMETEK_PROCESSOR_HH

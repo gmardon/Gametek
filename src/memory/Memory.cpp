@@ -9,8 +9,7 @@ Memory::Memory(Gametek *gametek) {
     this->m_gametek = gametek;
 }
 
-void Memory::init()
-{
+void Memory::init() {
     this->m_cartridge = m_gametek->getCartridge();
     this->m_processor = m_gametek->getProcessor();
     m_RAM = (uint8_t *) malloc(65536 * sizeof(uint8_t));
@@ -34,7 +33,7 @@ uint8_t Memory::get(uint16_t address) {
 }
 
 void Memory::printRAM() {
-    for(int i = 0; i < 65536; i++) {
+    for (int i = 0; i < 65536; i++) {
         if (i % 10 == 0)
             printf("\n%#-6i\t", i);
         if (m_RAM[i] == NULL)
@@ -45,20 +44,17 @@ void Memory::printRAM() {
 }
 
 uint8_t Memory::read(uint16_t address) {
+    printf("read at: %i address: %i\n", address & 0xE000, address);
     switch (address & 0xE000) {
         case 0x0000: {
-            if (m_gametek->getState() == BOOT)
-            {
-                if (m_cartridge->isGBC())
-                {
-                    if(address < 0x0100)
+            if (m_gametek->getState() == BOOT) {
+                if (m_cartridge->isGBC()) {
+                    if (address < 0x0100)
                         return BootRomCGB[address];
                     if (address < 0x0900 && address > 0x01FF)
                         return BootRomCGB[address - 0x100];
-                }
-                else
-                {
-                    if(address < 0x0100)
+                } else {
+                    if (address < 0x0100)
                         return BootRomDMG[address];
                 }
             }

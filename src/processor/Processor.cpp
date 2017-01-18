@@ -29,6 +29,8 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x0C] = (Operator) {0x0C, "INC C", &Processor::INC_C, 1};
     m_operators[0x0E] = (Operator) {0x0E, "LD C,n", &Processor::LD_C_N, 1};
+    m_operators[0x11] = (Operator) {0x11, "LD DE,nn", &Processor::LD_DE_NN, 1};
+    m_operators[0x1A] = (Operator) {0x1A, "LD A,(DE)", &Processor::LD_A_DE, 1};
     m_operators[0x20] = (Operator) {0x20, "JR NZ,n", &Processor::JR_NZ_N, 1};
     m_operators[0x21] = (Operator) {0x21, "LD HL,nn", &Processor::LD_HL_NN, 1};
     m_operators[0x22] = (Operator) {0x22, "LDI (HL),A", &Processor::LDI_HL_A, 1};
@@ -81,13 +83,13 @@ void Processor::executeOPCode(uint8_t opcode) {
 
     Operator *targetOperators;
     if (isCB) {
-        printf("[PC: %04X][Found: 0x%02X] Use CB operators\n", m_PC.getValue() - 1, opcode);
+        printf("[PC: %04X][ID: 0x%02X] Use CB operators\n", m_PC.getValue() - 1, opcode);
         opcode = retrieveOPCode();
         targetOperators = m_operatorsCB;
     } else
         targetOperators = m_operators;
     printf("[PC: %04X]", m_PC.getValue() - 1);
-    printf("[Found: 0x%02X] %s\n", opcode, targetOperators[opcode].name.c_str());
+    printf("[ID: 0x%02X] %s\n", opcode, targetOperators[opcode].name.c_str());
     auto ptrRef = targetOperators[opcode].function;
     (this->*ptrRef)();
 }
@@ -131,6 +133,17 @@ bool Processor::isSetFlag(uint8_t flag) {
 
 void Processor::NOP() {
 
+}
+
+void Processor::LD_DE_NN() {
+    OP_LD(m_DE.getLowRegister(), m_PC.getValue());
+    m_PC.increment();
+    OP_LD(m_DE.getHighRegister(), m_PC.getValue());
+    m_PC.increment();
+}
+
+void Processor::LD_A_DE() {
+    OP_LD(m_AF.getHighRegister(), m_DE.getValue());
 }
 
 void Processor::LD_SP_NN() {
