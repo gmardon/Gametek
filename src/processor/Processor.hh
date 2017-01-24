@@ -58,6 +58,7 @@ protected:
     void OP_DEC(EightBitRegister* reg);
     void OP_CP(uint8_t number);
     void OP_LD(uint16_t address, uint8_t reg);
+    void OP_RL(EightBitRegister* reg, bool isRegisterA = false);
     void OP_LD(EightBitRegister* reg, uint16_t address);
     void OP_INC(EightBitRegister* reg);
     void OP_BIT(EightBitRegister* reg, int bit);
@@ -90,6 +91,7 @@ protected:
     void LD_C_L();
     void LD_B_N();
     void PUSH_BC();
+    void RL_C();
 };
 
 #endif //GAMETEK_PROCESSOR_HH

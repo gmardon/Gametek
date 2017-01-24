@@ -49,6 +49,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0xFF] = (Operator) {0xFF, "RST 38H", &Processor::RST_38H, 1};
 
     m_operatorsCB = (Operator *) malloc(256 * (sizeof(Operator_t)));
+    m_operatorsCB[0x11] = (Operator) {0x11, "RL C", &Processor::RL_C, 1};
     m_operatorsCB[0x7C] = (Operator) {0x7C, "BIT 7,H", &Processor::BIT_7_H, 1};
 }
 
@@ -275,6 +276,22 @@ void Processor::JR_NZ_N() {
         //m_branchTaken = true;
     } else
         m_PC.increment();
+}
+
+void Processor::RL_C()  {
+    OP_RL(m_BC.getLowRegister());
+}
+
+void Processor::OP_RL(EightBitRegister* reg, bool isRegisterA)
+{
+    uint8_t carry = isSetFlag(FLAG_CARRY) ? 1 : 0;
+    uint8_t result = reg->getValue();
+    ((result & 0x80) != 0) ? setFlag(FLAG_CARRY) : clearAllFlags();
+    result <<= 1;
+    result |= carry;
+    reg->setValue(result);
+    if (!isRegisterA)
+        toggleZeroFlagFromResult(result);
 }
 
 void Processor::ADD_HL(uint8_t number) {
