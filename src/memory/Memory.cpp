@@ -44,7 +44,6 @@ void Memory::printRAM() {
 }
 
 uint8_t Memory::read(uint16_t address) {
-    printf("read at: %i address: %i\n", address & 0xE000, address);
     switch (address & 0xE000) {
         case 0x0000: {
             if (m_gametek->getState() == BOOT) {
@@ -54,7 +53,7 @@ uint8_t Memory::read(uint16_t address) {
                     if (address < 0x0900 && address > 0x01FF)
                         return BootRomCGB[address - 0x100];
                 } else {
-                    if (address < 0x0100)
+                    if (address < 0x0200) // might be 0x0100 but it works...
                         return BootRomDMG[address];
                 }
             }

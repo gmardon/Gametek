@@ -4,7 +4,6 @@
 
 #include <zconf.h>
 #include "Processor.hh"
-#include "../Gametek.hh"
 
 Processor::Processor(Gametek *gametek) {
     m_memory = gametek->getMemory();
@@ -26,6 +25,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators = (Operator *) malloc(256 * (sizeof(Operator_t)));
     m_operators[0x00] = (Operator) {0x00, "NOP", &Processor::NOP, 1};
     m_operators[0x05] = (Operator) {0x05, "DEC B", &Processor::DEC_B, 1};
+    m_operators[0x06] = (Operator) {0x06, "LD B,n", &Processor::LD_B_N, 1};
     m_operators[0x08] = (Operator) {0x08, "LD (nn),SP", &Processor::LD_NN_SP, 1};
     m_operators[0x0C] = (Operator) {0x0C, "INC C", &Processor::INC_C, 1};
     m_operators[0x0E] = (Operator) {0x0E, "LD C,n", &Processor::LD_C_N, 1};
@@ -38,8 +38,11 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x31] = (Operator) {0x31, "LD SP,nn", &Processor::LD_SP_NN, 1};
     m_operators[0x32] = (Operator) {0x32, "LDD (HL),A", &Processor::LDD_HL_A, 1};
     m_operators[0x3E] = (Operator) {0x3E, "LD A,n", &Processor::LD_A_N, 1};
+    m_operators[0x4F] = (Operator) {0x4F, "LD C,L", &Processor::LD_C_L, 1};
     m_operators[0x77] = (Operator) {0x77, "LD (HL),A", &Processor::LD_HL_A, 1};
     m_operators[0xAF] = (Operator) {0xAF, "XOR A", &Processor::XOR_A, 1};
+    m_operators[0xC5] = (Operator) {0xC5, "PUSH BC", &Processor::PUSH_BC, 1};
+    m_operators[0xCD] = (Operator) {0xCD, "CALL nn", &Processor::CALL_NN, 1};
     m_operators[0xE0] = (Operator) {0xE0, "LDH (n),A", &Processor::LDH_N_A, 1};
     m_operators[0xE2] = (Operator) {0xE2, "LDH (C),A", &Processor::LDH_C_A, 1};
     m_operators[0xFE] = (Operator) {0xFE, "CP N", &Processor::CP_N, 1};
@@ -52,9 +55,9 @@ Processor::Processor(Gametek *gametek) {
 uint8_t Processor::tick() {
     if (m_gametek->getState() != HALT) {
         if (m_gametek->getState() == BOOT) {
-            uint16_t pc_before = m_memory->read(m_PC.getValue());
+            uint16_t pc_before = m_PC.getValue();
             executeOPCode(retrieveOPCode());
-            uint16_t pc_after = m_memory->read(m_PC.getValue());
+            uint16_t pc_after = m_PC.getValue();
             if ((pc_before == 0xFE) && (pc_after == 0x100))
                 m_gametek->setState(IN_GAME);
         } else
@@ -165,6 +168,10 @@ void Processor::LD_HL_A() {
     OP_LD(m_HL.getValue(), m_AF.getHigh());
 }
 
+void Processor::LD_C_L() {
+    OP_LD(m_BC.getLowRegister(), m_AF.getHigh());
+}
+
 void Processor::CP_N() {
     OP_CP(m_memory->read(m_PC.getValue()));
     m_PC.increment();
@@ -173,6 +180,25 @@ void Processor::CP_N() {
 void Processor::RST_38H() {
     stackPush(&m_PC);
     m_PC.setValue(0x0038);
+}
+
+void Processor::LD_B_N() {
+    OP_LD(m_BC.getHighRegister(), m_PC.getValue());
+    m_PC.increment();
+}
+
+void Processor::PUSH_BC() {
+    stackPush(&m_BC);
+}
+
+void Processor::CALL_NN() {
+    uint8_t low = m_memory->read(m_PC.getValue());
+    m_PC.increment();
+    uint8_t high = m_memory->read(m_PC.getValue());
+    m_PC.increment();
+    stackPush(&m_PC);
+    m_PC.setHigh(high);
+    m_PC.setLow(low);
 }
 
 void Processor::LD_A_N() {
@@ -280,7 +306,6 @@ void Processor::OP_XOR(uint8_t number) {
     toggleZeroFlagFromResult(result);
 }
 
-
 void Processor::OP_DEC(EightBitRegister *reg) {
     uint8_t result = reg->getValue() - 1;
     reg->setValue(result);
@@ -325,4 +350,10 @@ void Processor::stackPop(SixteenBitRegister *reg) {
     m_SP.increment();
     reg->setHigh(m_memory->read(m_SP.getValue()));
     m_SP.increment();
+}
+
+void Processor::printStatus() {
+    printf("******** Status **********\n");
+    printf("AF:%04x BC:%04x DE:%04x HL:%04x PC:%04x SP:%04x\n", m_AF.getValue(), m_BC.getValue(), m_DE.getValue(), m_HL.getValue(), m_PC.getValue(), m_SP.getValue());
+    printf("**************************\n");
 }

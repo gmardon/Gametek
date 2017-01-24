@@ -89,6 +89,9 @@ bool Cartridge::updateMetadata() {
     printf("ROM Type %d\n", this->m_type);
     printf("ROM Size %d\n", this->m_ROMSize);
     printf("RAM Size %d\n", this->m_RAMSize);
+    printf("SUPPORT GBC %d\n", this->m_GBC);
+    printf("SUPPORT SGB %d\n", this->m_SGB);
+    printf("GBC ONLY %d\n", m_data[0x143] == 0xC0);
 
     int checksum = 0;
     for (int j = 0x134; j < 0x14E; j++)
@@ -100,13 +103,6 @@ bool Cartridge::updateMetadata() {
         printf("ROM Checksum : OK!\n");
     else
         printf("ROM Checksum : FAILED!!!\n");
-
-    if (m_data[0x143] == 0xC0)
-        printf("Game Boy Color only\n");
-    if (this->m_GBC)
-        printf("Game Boy Color supported\n");
-    if (this->m_SGB)
-        printf("Super Game Boy supported\n");
 
     return true;
 }

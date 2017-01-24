@@ -53,6 +53,7 @@ protected:
     void untoggleFlag(uint8_t flag);
     bool isSetFlag(uint8_t flag);
     void ADD_HL(uint8_t number);
+    void printStatus();
     void OP_XOR(uint8_t number);
     void OP_DEC(EightBitRegister* reg);
     void OP_CP(uint8_t number);
@@ -85,6 +86,10 @@ protected:
     void LDH_N_A();
     void LD_DE_NN();
     void LD_A_DE();
+    void CALL_NN();
+    void LD_C_L();
+    void LD_B_N();
+    void PUSH_BC();
 };
 
 #endif //GAMETEK_PROCESSOR_HH
