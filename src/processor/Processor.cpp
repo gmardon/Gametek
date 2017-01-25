@@ -74,10 +74,10 @@ uint8_t Processor::retrieveOPCode() {
     uint8_t opcode = m_memory->read(m_PC.getValue());
     m_PC.increment();
 
-    /*if (m_bSkipPCBug)
+    /*if (m_skipPCBug)
     {
-        m_bSkipPCBug = false;
-        PC.Decrement();
+        m_skipPCBug = false;
+        m_PC.decrement();
     }*/
 
     return opcode;
@@ -383,4 +383,8 @@ void Processor::printStatus() {
     printf("******** Status **********\n");
     printf("AF:%04x BC:%04x DE:%04x HL:%04x PC:%04x SP:%04x\n", m_AF.getValue(), m_BC.getValue(), m_DE.getValue(), m_HL.getValue(), m_PC.getValue(), m_SP.getValue());
     printf("**************************\n");
+}
+
+const SixteenBitRegister &Processor::getPC() const {
+    return m_PC;
 }

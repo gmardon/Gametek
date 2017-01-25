@@ -20,8 +20,12 @@ Memory::~Memory() {
 }
 
 void Memory::fillFromCartridge(Cartridge *cartridge) {
-    for (int i = 0; i < 65536; i++)
-        this->m_RAM[i] = cartridge->getROM()[i];
+    for (int i = 0; i < 65536; i++) {
+        if (i < 100)
+            this->m_RAM[i] = BootRomDMG[i];
+        else
+            this->m_RAM[i] = cartridge->getROM()[i];
+    }
 }
 
 uint8_t Memory::get(uint16_t address) {

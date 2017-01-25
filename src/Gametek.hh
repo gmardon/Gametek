@@ -7,6 +7,7 @@
 #include "memory/Memory.hh"
 #include "processor/Processor.hh"
 #include "cartridge/Cartridge.hh"
+#include "tools/hexview/HexViewWindow.h"
 
 // From GameBoy-Online emulator
 const uint8_t BootRomDMG[256] = {
@@ -193,11 +194,14 @@ protected:
     Memory *m_memory;
     Processor *m_processor;
     GameState m_state;
+    HexViewWindow *m_hewView;
     int m_RTCUpdateCount;
 
     void run();
 
     bool addMemoryHandlers();
+
+    void runHexViewer();
 };
 
 

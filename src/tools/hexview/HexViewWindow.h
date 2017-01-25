@@ -9,7 +9,7 @@ Q_OBJECT
 public:
     HexViewWindow(QWidget *parent = 0, Qt::WindowFlags flags = 0);
 
-    void setData(char *buffer, int size);
+    void setData(char *buffer, int size, int index);
 
 protected:
     virtual void closeEvent(QCloseEvent *);

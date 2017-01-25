@@ -1,15 +1,9 @@
 #include "QHexView.h"
 #include <QScrollBar>
 #include <QPainter>
-#include <QSize>
 #include <QPaintEvent>
-#include <QKeyEvent>
 #include <QClipboard>
 #include <QApplication>
-
-#include <QDebug>
-
-#include <stdexcept>
 
 const int HEXCHARS_IN_LINE = 47;
 const int GAP_ADR_HEX = 10;
@@ -402,7 +396,6 @@ void QHexView::mousePressEvent(QMouseEvent * event)
 
 	viewport() -> update();
 }
-
 
 std::size_t QHexView::cursorPos(const QPoint &position)
 {

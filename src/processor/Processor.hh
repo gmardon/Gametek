@@ -26,6 +26,7 @@ public:
 
     uint8_t tick();
 
+    const SixteenBitRegister &getPC() const;
 private:
     void executeOPCode(uint8_t opcode);
 
@@ -41,6 +42,8 @@ private:
     SixteenBitRegister m_HL;
     SixteenBitRegister m_SP;
     SixteenBitRegister m_PC;
+
+private:
     Operator *m_operators;
     Operator *m_operatorsCB;
 
