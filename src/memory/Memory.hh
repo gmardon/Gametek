@@ -27,6 +27,7 @@ public:
     void load(uint16_t address, uint8_t value);
     void init();
     void printRAM();
+    uint8_t *getRAM();
 private:
     Gametek *m_gametek;
     Cartridge *m_cartridge;

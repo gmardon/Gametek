@@ -4,6 +4,8 @@
 //
 
 #include <zconf.h>
+#include <src/tools/hexview/HexViewWindow.h>
+#include <QtWidgets/QApplication>
 #include "Gametek.hh"
 #include "memory/handlers/ROMMemoryHandler.hh"
 #include "memory/handlers/IOMemoryHandler.hh"
@@ -71,11 +73,22 @@ bool Gametek::addMemoryHandlers() {
 }
 
 void Gametek::run() {
+    char **av = new char *[2];
+    av[0] = strdup("./gametek");
+    av[1] = NULL;
+    QApplication app(*(new int(1)), av);
+
+    HexViewWindow wgt;
+    wgt.show();
+
     uint8_t cycles;
+
     if (m_cartridge->isROMReaded()) {
         m_RTCUpdateCount = 0;
         while (Gametek::getState() != HALT) {
+            app.processEvents();
             cycles = m_processor->tick();
+            wgt.setData((char*) m_memory->getRAM(), 65536);
 
             m_RTCUpdateCount++;
             if (m_RTCUpdateCount == 50) {
@@ -83,7 +96,7 @@ void Gametek::run() {
                 m_processor->updateRealtimeClock();
             }
             // simulate ticks \o/
-            //usleep(100000);
+            usleep(100000);
         }
     }
 }

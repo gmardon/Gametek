@@ -2,8 +2,8 @@
 // Created by gmardon on 13/01/17.
 //
 
+#include <cstring>
 #include "Memory.hh"
-#include "../processor/Processor.hh"
 
 Memory::Memory(Gametek *gametek) {
     this->m_gametek = gametek;
@@ -20,9 +20,8 @@ Memory::~Memory() {
 }
 
 void Memory::fillFromCartridge(Cartridge *cartridge) {
-    for (int i = 0; i < 0x8000; i++) {
+    for (int i = 0; i < 65536; i++)
         this->m_RAM[i] = cartridge->getROM()[i];
-    }
 }
 
 uint8_t Memory::get(uint16_t address) {
@@ -30,6 +29,10 @@ uint8_t Memory::get(uint16_t address) {
         return (m_RAM[address]);
     else
         return (NULL);
+}
+
+uint8_t *Memory::getRAM() {
+    return m_RAM;
 }
 
 void Memory::printRAM() {
@@ -79,6 +82,7 @@ uint8_t Memory::read(uint16_t address) {
 }
 
 void Memory::write(uint16_t address, uint8_t value) {
+    printf("try to write at : %02X\n value %02X", address, value);
     switch (address & 0xE000) {
         case 0x0000:
         case 0x2000:

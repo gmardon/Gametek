@@ -44,12 +44,12 @@ QHexView::~QHexView()
 
 void QHexView::setData(QHexView::DataStorage *pData)
 {
-	verticalScrollBar()->setValue(0);
-	if(m_pdata)
-		delete m_pdata;
+	//verticalScrollBar()->setValue(0);
+	//if(m_pdata)
+	//	delete m_pdata;
 	m_pdata = pData;
-	m_cursorPos = 0;
-	resetSelection(0);
+	//m_cursorPos = 0;
+	//resetSelection(0);
 }
 
 
