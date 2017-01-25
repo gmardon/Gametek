@@ -9,7 +9,7 @@ find_package(Qt5Widgets)
 find_package(Qt5Gui)
 find_package(Qt5Core)
 
-set(SOURCE_FILES src/main.cpp)
+set(SOURCE_FILES ../src/processor/Operator.hh ../src/cartridge/Cartridge.cpp src/main.cpp src/gui/MainWindow.cpp src/gui/MainWindow.h src/gui/Highlighter.cpp src/gui/Highlighter.h src/decompiler/Decompiler.cpp src/decompiler/Decompiler.h)
 add_executable(editor ${SOURCE_FILES})
 
 target_link_libraries(editor Qt5Core)
