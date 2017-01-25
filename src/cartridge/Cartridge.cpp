@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <cstring>
 #include "Cartridge.hh"
-#include "../Gametek.hh"
 
 Cartridge::Cartridge(Gametek *gametek) {
     this->m_data = NULL;
@@ -87,8 +86,8 @@ bool Cartridge::updateMetadata() {
     printf("ROM Name %s\n", this->m_name.c_str());
     printf("ROM Version %d\n", this->m_version);
     printf("ROM Type %d\n", this->m_type);
-    printf("ROM Size %d\n", this->m_ROMSize);
-    printf("RAM Size %d\n", this->m_RAMSize);
+    printf("ROM Size %dKB\n", (int) pow(4.0, (double) m_ROMSize) / 2);
+    printf("RAM Size %dKB\n", (int) pow(4.0, (double) m_RAMSize) / 2);
     printf("SUPPORT GBC %d\n", this->m_GBC);
     printf("SUPPORT SGB %d\n", this->m_SGB);
     printf("GBC ONLY %d\n", m_data[0x143] == 0xC0);
@@ -107,8 +106,7 @@ bool Cartridge::updateMetadata() {
     return true;
 }
 
-bool Cartridge::isROMReaded() const
-{
+bool Cartridge::isROMReaded() const {
     return m_readed;
 }
 
@@ -124,14 +122,12 @@ int Cartridge::getRAMSize() const {
     return this->m_RAMSize;
 }
 
-void Cartridge::setCartridgeType(int type)
-{
+void Cartridge::setCartridgeType(int type) {
     CartridgeType cartridgeType;
     if ((type != 0xEA) && (this->getROMSize() == 0))
         type = 0;
 
-    switch (type)
-    {
+    switch (type) {
         case 0x00:
             // NO MBC
         case 0x08:
@@ -247,8 +243,7 @@ void Cartridge::setCartridgeType(int type)
             printf("** Unknown cartridge type: %d\n **", type);
     }
 
-    switch (type)
-    {
+    switch (type) {
         case 0x03:
         case 0x06:
         case 0x09:
@@ -264,40 +259,36 @@ void Cartridge::setCartridgeType(int type)
         case 0xFF:
             // m_bBattery = true;
             break;
-        //default:
+            //default:
             // m_bBattery = false;
     }
 
-    switch (type)
-    {
+    switch (type) {
         case 0x0F:
         case 0x10:
             // m_bRTCPresent = true;
             break;
-        //default:
+            //default:
             // m_bRTCPresent = false;
     }
 
-    switch (type)
-    {
+    switch (type) {
         case 0x1C:
         case 0x1D:
         case 0x1E:
             // m_bRumblePresent = true;
             break;
-        //default:
+            //default:
             // m_bRumblePresent = false;
     }
     this->m_type = cartridgeType;
 }
 
-uint8_t *Cartridge::getROM() const
-{
+uint8_t *Cartridge::getROM() const {
     return (this->m_data);
 }
 
-bool Cartridge::isGBC() const
-{
+bool Cartridge::isGBC() const {
     return (this->m_GBC);
 }
 
