@@ -91,7 +91,9 @@ protected:
     void LD_C_L();
     void LD_B_N();
     void PUSH_BC();
+    void POP_BC();
     void RL_C();
+    void RL_A();
 };
 
 #endif //GAMETEK_PROCESSOR_HH

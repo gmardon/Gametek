@@ -30,6 +30,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x0C] = (Operator) {0x0C, "INC C", &Processor::INC_C, 1};
     m_operators[0x0E] = (Operator) {0x0E, "LD C,n", &Processor::LD_C_N, 1};
     m_operators[0x11] = (Operator) {0x11, "LD DE,nn", &Processor::LD_DE_NN, 1};
+    m_operators[0x17] = (Operator) {0x17, "RL A", &Processor::RL_A, 1};
     m_operators[0x1A] = (Operator) {0x1A, "LD A,(DE)", &Processor::LD_A_DE, 1};
     m_operators[0x20] = (Operator) {0x20, "JR NZ,n", &Processor::JR_NZ_N, 1};
     m_operators[0x21] = (Operator) {0x21, "LD HL,nn", &Processor::LD_HL_NN, 1};
@@ -41,6 +42,7 @@ Processor::Processor(Gametek *gametek) {
     m_operators[0x4F] = (Operator) {0x4F, "LD C,L", &Processor::LD_C_L, 1};
     m_operators[0x77] = (Operator) {0x77, "LD (HL),A", &Processor::LD_HL_A, 1};
     m_operators[0xAF] = (Operator) {0xAF, "XOR A", &Processor::XOR_A, 1};
+    m_operators[0xC1] = (Operator) {0xC1, "POP BC", &Processor::POP_BC, 1};
     m_operators[0xC5] = (Operator) {0xC5, "PUSH BC", &Processor::PUSH_BC, 1};
     m_operators[0xCD] = (Operator) {0xCD, "CALL nn", &Processor::CALL_NN, 1};
     m_operators[0xE0] = (Operator) {0xE0, "LDH (n),A", &Processor::LDH_N_A, 1};
@@ -192,6 +194,10 @@ void Processor::PUSH_BC() {
     stackPush(&m_BC);
 }
 
+void Processor::POP_BC() {
+    stackPop(&m_BC);
+}
+
 void Processor::CALL_NN() {
     uint8_t low = m_memory->read(m_PC.getValue());
     m_PC.increment();
@@ -255,6 +261,10 @@ void Processor::LDH_C_A() {
 void Processor::LDH_N_A() {
     OP_LD(static_cast<uint16_t> (0xFF00 + m_memory->read(m_PC.getValue())), m_AF.getHigh());
     m_PC.increment();
+}
+
+void Processor::RL_A() {
+    OP_RL(m_AF.getHighRegister(), true);
 }
 
 void Processor::DEC_B() {
