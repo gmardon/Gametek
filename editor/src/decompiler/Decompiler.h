@@ -17,7 +17,7 @@ public:
     Decompiler();
 
     std::string decompile(const std::string file);
-
+    Operator *getOperators() const;
 private:
     Operator *m_operators;
 };

@@ -47,11 +47,15 @@ std::string Decompiler::decompile(const std::string file) {
     uint8_t *buffer = cartridge->getROM();
     int index = 0x100;
     while (index < 0x200) {
-        if (m_operators[buffer[index]].name == "") {
+        if (m_operators[buffer[index]].name != "") {
             content << m_operators[buffer[index]].name << std::endl;
         }
         index++;
     }
     return content.str();
+}
+
+Operator *Decompiler::getOperators() const {
+    return m_operators;
 }
 

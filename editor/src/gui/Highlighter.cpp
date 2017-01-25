@@ -2,29 +2,25 @@
 // Created by gmardon on 25/01/17.
 //
 
+#include <src/decompiler/Decompiler.h>
 #include "Highlighter.h"
 
 Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
 {
+    Decompiler *decompiler = new Decompiler();
     HighlightingRule rule;
 
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
-    QStringList keywordPatterns;
-    keywordPatterns << "\\bchar\\b" << "\\bclass\\b" << "\\bconst\\b"
-                    << "\\bdouble\\b" << "\\benum\\b" << "\\bexplicit\\b"
-                    << "\\bfriend\\b" << "\\binline\\b" << "\\bint\\b"
-                    << "\\blong\\b" << "\\bnamespace\\b" << "\\boperator\\b"
-                    << "\\bprivate\\b" << "\\bprotected\\b" << "\\bpublic\\b"
-                    << "\\bshort\\b" << "\\bsignals\\b" << "\\bsigned\\b"
-                    << "\\bslots\\b" << "\\bstatic\\b" << "\\bstruct\\b"
-                    << "\\btemplate\\b" << "\\btypedef\\b" << "\\btypename\\b"
-                    << "\\bunion\\b" << "\\bunsigned\\b" << "\\bvirtual\\b"
-                    << "\\bvoid\\b" << "\\bvolatile\\b";
-    foreach (const QString &pattern, keywordPatterns) {
-        rule.pattern = QRegExp(pattern);
-        rule.format = keywordFormat;
-        highlightingRules.append(rule);
+
+    int index = 0;
+    while (index < 256) {
+        if (decompiler->getOperators()[index].name != "") {
+            rule.pattern = QRegExp(QString::fromStdString("\\b" + decompiler->getOperators()[index].name + "\\b"));
+            rule.format = keywordFormat;
+            highlightingRules.append(rule);
+        }
+        index++;
     }
 
     classFormat.setFontWeight(QFont::Bold);

@@ -4,7 +4,7 @@
 
 #ifndef GAMETEK_HIGHLIGHTER_H
 #define GAMETEK_HIGHLIGHTER_H
-
+#include <src/decompiler/Decompiler.h>
 #include <QSyntaxHighlighter>
 #include <QTextCharFormat>
 
@@ -14,7 +14,7 @@ class Highlighter : public QSyntaxHighlighter {
 Q_OBJECT
 
 public:
-    Highlighter(QTextDocument *parent = 0);
+    Highlighter(QTextDocument *parent);
 
 protected:
     void highlightBlock(const QString &text) override;
