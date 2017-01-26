@@ -10,5 +10,6 @@ int main(int argc, char *argv[])
     MainWindow window;
     window.resize(640, 512);
     window.show();
+    window.openASMFile("../../resources/cgb_boot.asm");
     return app.exec();
 }

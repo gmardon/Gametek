@@ -32,6 +32,8 @@ private:
     QTextCharFormat keywordFormat;
     QTextCharFormat classFormat;
     QTextCharFormat singleLineCommentFormat;
+    QTextCharFormat semicolonLineCommentFormat;
+    QTextCharFormat labelFormat;
     QTextCharFormat multiLineCommentFormat;
     QTextCharFormat quotationFormat;
     QTextCharFormat functionFormat;

@@ -17,7 +17,8 @@ public:
     MainWindow(QWidget *parent = 0);
 
 public slots:
-    void openFile(const QString &path = QString());
+    void openGBFile(const QString &path = QString());
+    void openASMFile(const QString &path = QString());
 
 private:
     void setupEditor();

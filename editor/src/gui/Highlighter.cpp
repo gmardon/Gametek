@@ -5,22 +5,19 @@
 #include <src/decompiler/Decompiler.h>
 #include "Highlighter.h"
 
-Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
-{
+Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     Decompiler *decompiler = new Decompiler();
     HighlightingRule rule;
 
     keywordFormat.setForeground(Qt::darkBlue);
     keywordFormat.setFontWeight(QFont::Bold);
+    QStringList keywordPatterns;
+    keywordPatterns << "\\bld\\b" << "\\bdec\\b" << "\\binc\\b";
 
-    int index = 0;
-    while (index < 256) {
-        if (decompiler->getOperators()[index].name != "") {
-            rule.pattern = QRegExp(QString::fromStdString("\\b" + decompiler->getOperators()[index].name + "\\b"));
-            rule.format = keywordFormat;
-            highlightingRules.append(rule);
-        }
-        index++;
+    foreach (const QString &pattern, keywordPatterns) {
+        rule.pattern = QRegExp(pattern);
+        rule.format = keywordFormat;
+        highlightingRules.append(rule);
     }
 
     classFormat.setFontWeight(QFont::Bold);
@@ -29,9 +26,19 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
     rule.format = classFormat;
     highlightingRules.append(rule);
 
+    labelFormat.setForeground(QBrush("#3498db"));
+    rule.pattern = QRegExp(".[^\n]*:");
+    rule.format = labelFormat;
+    highlightingRules.append(rule);
+
     singleLineCommentFormat.setForeground(Qt::red);
     rule.pattern = QRegExp("//[^\n]*");
     rule.format = singleLineCommentFormat;
+    highlightingRules.append(rule);
+
+    semicolonLineCommentFormat.setForeground(QBrush("#27ae60"));
+    rule.pattern = QRegExp(";[^\n]*");
+    rule.format = semicolonLineCommentFormat;
     highlightingRules.append(rule);
 
     multiLineCommentFormat.setForeground(Qt::red);
@@ -51,17 +58,16 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent)
     commentEndExpression = QRegExp("\\*/");
 }
 
-void Highlighter::highlightBlock(const QString &text)
-{
-    foreach (const HighlightingRule &rule, highlightingRules) {
-        QRegExp expression(rule.pattern);
-        int index = expression.indexIn(text);
-        while (index >= 0) {
-            int length = expression.matchedLength();
-            setFormat(index, length, rule.format);
-            index = expression.indexIn(text, index + length);
+void Highlighter::highlightBlock(const QString &text) {
+            foreach (const HighlightingRule &rule, highlightingRules) {
+            QRegExp expression(rule.pattern);
+            int index = expression.indexIn(text);
+            while (index >= 0) {
+                int length = expression.matchedLength();
+                setFormat(index, length, rule.format);
+                index = expression.indexIn(text, index + length);
+            }
         }
-    }
     setCurrentBlockState(0);
 
     int startIndex = 0;
