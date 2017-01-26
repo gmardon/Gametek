@@ -9,10 +9,10 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     Decompiler *decompiler = new Decompiler();
     HighlightingRule rule;
 
-    keywordFormat.setForeground(Qt::darkBlue);
+    keywordFormat.setForeground(QBrush("#16a085"));
     keywordFormat.setFontWeight(QFont::Bold);
     QStringList keywordPatterns;
-    keywordPatterns << "\\bld\\b" << "\\bdec\\b" << "\\binc\\b";
+    keywordPatterns << "\\bld\\b" << "\\bdec\\b" << "\\binc\\b" << "\\bdb\\b";
 
     foreach (const QString &pattern, keywordPatterns) {
         rule.pattern = QRegExp(pattern);
@@ -27,13 +27,18 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     highlightingRules.append(rule);
 
     labelFormat.setForeground(QBrush("#3498db"));
-    rule.pattern = QRegExp(".[^\n]*:");
+    rule.pattern = QRegExp("\\.[^\n]*:");
     rule.format = labelFormat;
     highlightingRules.append(rule);
 
     singleLineCommentFormat.setForeground(Qt::red);
     rule.pattern = QRegExp("//[^\n]*");
     rule.format = singleLineCommentFormat;
+    highlightingRules.append(rule);
+
+    hexaFormat.setForeground(QBrush("#9b59b6"));
+    rule.pattern = QRegExp("\\$[0-9A-Fa-f]*");
+    rule.format = hexaFormat;
     highlightingRules.append(rule);
 
     semicolonLineCommentFormat.setForeground(QBrush("#27ae60"));
@@ -49,8 +54,8 @@ Highlighter::Highlighter(QTextDocument *parent) : QSyntaxHighlighter(parent) {
     highlightingRules.append(rule);
 
     functionFormat.setFontItalic(true);
-    functionFormat.setForeground(Qt::blue);
-    rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
+    functionFormat.setForeground(QBrush("#3498db"));
+    rule.pattern = QRegExp("[^\n]*:");
     rule.format = functionFormat;
     highlightingRules.append(rule);
 
