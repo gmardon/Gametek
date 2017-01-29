@@ -15,7 +15,7 @@
 Gametek::Gametek() {
     m_state = BOOT;
     m_memory = new Memory(this);
-    m_cartridge = new Cartridge(this);
+    m_cartridge = new Cartridge();
     m_processor = new Processor(this);
     m_memory->init();
 }
